@@ -1,0 +1,434 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>
+            CreditSafe Dashboard
+        </title>
+        <meta name="description" content="CreditSafe Dashboard">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+        <!-- Call App Mode on ios devices -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <!-- Remove Tap Highlight on Windows Phone IE -->
+        <meta name="msapplication-tap-highlight" content="no">
+        <!-- base css -->
+        <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="{% static 'css/vendors.bundle.css' %}">
+        <link id="appbundle" rel="stylesheet" media="screen, print" href="{% static 'css/app.bundle.css' %}">
+        <link id="myskin" rel="stylesheet" media="screen, print" href="{% static 'css/skins/skin-master.css' %}">
+        <!-- Place favicon.ico in the root directory -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
+        <link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#5bbad5">
+        <link rel="stylesheet" media="screen, print" href="{% static 'css/datagrid/datatables/datatables.bundle.css' %}">
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    </head>
+    <style>
+        #searchbtn{
+            border-radius: 10px;
+            border: 1px solid rgb(87, 78, 78);
+            cursor: pointer;
+        }
+
+        #searchbtn:hover{
+            border-color:black;
+            background-color: #eee7f8;
+        }
+
+        #companiesData tr, #orderCompaniesData1 tr{
+            cursor: pointer;
+        }
+        
+        #orderInvestigation{
+            float: right;margin-left:100%;margin-right: 15px;cursor: pointer;
+        }
+
+        #orderInvestigation:hover{
+            color: rebeccapurple;
+        }
+    </style>
+
+    <body class="mod-bg-1 mod-nav-link ">
+        <!-- BEGIN Page Wrapper -->
+        <div class="page-wrapper">
+            <div class="page-inner">
+                <div class="page-content-wrapper">
+                    <main id="js-page-content" role="main" class="page-content">
+                        <ol class="breadcrumb page-breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+                            <li class="breadcrumb-item active">CreditSafe Dashboard</li>
+                            <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+                        </ol>
+                        <div class="subheader">
+                            <h1 class="subheader-title">
+                                <i class='subheader-icon fal fa-chart-area'></i> CreditSafe <span class='fw-300'>Dashboard</span>
+                            </h1>
+                        </div>
+                        <div class="my-3">
+                            <form action="void:javascript(0);">
+                                <div class="row ">
+                                    <div class="col-md-3 col-sm-6 col-12 my-1">
+                                        <input type="text" id="name-field" placeholder="Company name" class="form-control" tabindex="1" required>
+                                    </div>
+                                    <div class="col-md-2 col-sm-6 col-12 my-1">
+                                        <select name="country-field" id="country-field" class="form-control" required>
+                                            <option value="">Select Country</option>
+                                            {% for item in data %}
+                                            <option value="{{item.key}}">{{item.value}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </div>
+                                    <div class="col-md-2 col-sm-6 col-12 my-1">
+                                        <select name="company-type-field" id="company-type-field" class="form-control">
+                                            <option value="" >Company Type</option>
+                                            <option value="company">Company</option>
+                                            <option value="registration">Registration</option>
+                                            <option value="vat">VAT</option>
+                                        </select>
+                                        </div>
+                                    <div class="col-lg-1 col-md-2 col-sm-2 col-12 my-1">
+                                        <button type="button" onclick="fetchCompany();" class="form-control px-2" id="searchbtn">Search</button>
+                                    </div>
+                                </div>
+                            </form>                            
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-xl-3">
+                                <div class="p-3 bg-primary-300 rounded overflow-hidden position-relative text-white mb-g">
+                                    <div class="">
+                                        <h3 class="display-4 d-block l-h-n m-0 fw-500">
+                                            <p id="totalcompanyfetch">0</p>
+                                            <small class="m-0 l-h-n">Total Company Found</small>
+                                        </h3>
+                                    </div>
+                                    <i class="fal fa-user position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" style="font-size:6rem"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="panel-4" class="panel">
+                                    <div class="panel-hdr">
+                                        <div class="col-6">
+                                            <h2>
+                                                Company <span class="fw-300"><i>Records</i></span>
+                                            </h2>
+                                        </div>
+                                        <div class="col-6">
+                                            <h2 id="orderInvestigation" onclick="openOrderInvest(this)">
+                                                OrderInvestigation
+                                            </h2>
+                                        </div>
+                                        
+                                    </div>
+                                    <form action="void:javascript(0);">
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <!-- <input type="search" id="search-field" placeholder="Company name" class="form-control mt-2 ml-3" tabindex="1" style="border: 1px solid #584475;"> -->
+                                            </div> 
+                                            <div class="col-9">
+                                                <div class="mr-3 my-3 d-flex" style="margin-left: 100%;float: right;font-size: 15px;">
+                                                    <span class="my-1"><strong>Status:</strong></span>
+                                                    <div class="form-check mx-2" style="cursor: pointer;">
+                                                        <input class="form-check-input mt-1" type="radio" name="exampleRadios" id="exampleRadios1" value="all" onclick="statusbtn('all')" style="cursor: pointer;">
+                                                        <label class="form-check-label" for="exampleRadios1" style="cursor: pointer;">
+                                                          All
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mx-2" style="cursor: pointer;">
+                                                        <input class="form-check-input mt-1" type="radio" name="exampleRadios" id="exampleRadios2" value="active" onclick="statusbtn('active')" style="cursor: pointer;">
+                                                        <label class="form-check-label" for="exampleRadios2" style="cursor: pointer;">
+                                                          Active
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input mt-1" type="radio" name="exampleRadios" id="exampleRadios3" value="inactive" onclick="statusbtn('inactive')"  style="cursor: pointer;">
+                                                        <label class="form-check-label" for="exampleRadios3" style="cursor: pointer;">
+                                                            Inactive
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>                                           
+                                        </div>                                                
+                                    </form>
+                                    <div class="panel-container show">
+                                        <div class="panel-content">
+                                            <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                                                <thead class="bg-warning-200" style="position: sticky;top:0;">
+                                                    <tr>
+                                                        <th>S.N</th>
+                                                        <th>Name</th>
+                                                        <th>Status</th>
+                                                        <th>RegistrationNumber</th>
+                                                        <th>VatNumber</th>
+                                                        <th>Address</th>
+                                                        <th>Financial Year</th>
+                                                        <th>Id</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="companiesData">
+                                                                                                     
+                                                </tbody>
+                                               
+                                            </table>
+                                            <!-- datatable end -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <!-- this overlay is activated only when mobile menu is triggered -->
+                    <div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div> <!-- END Page Content -->
+                    <!-- BEGIN Page Footer -->
+                    <footer class="page-footer" role="contentinfo">
+                        <div class="d-flex align-items-center flex-1 text-muted">
+                            <span class="hidden-md-down fw-700">2020 © Manishankar by&nbsp;<a href='https://www.group-ucs.com/' class='text-primary fw-500' title='group-ucs.com' target='_blank'>https://www.group-ucs.com/</a></span>
+                        </div>
+                    </footer>
+                    <!-- END Page Footer -->
+                    <!-- BEGIN Shortcuts -->
+                    <div class="modal fade modal-backdrop-transparent" id="modal-shortcut" tabindex="-1" role="dialog" aria-labelledby="modal-shortcut" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-top modal-transparent" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <ul class="app-list w-auto h-auto p-0 text-left">
+                                        <li>
+                                            <a href="intel_introduction.html" class="app-list-item text-white border-0 m-0">
+                                                <div class="icon-stack">
+                                                    <i class="base base-7 icon-stack-3x opacity-100 color-primary-500 "></i>
+                                                    <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
+                                                    <i class="fal fa-home icon-stack-1x opacity-100 color-white"></i>
+                                                </div>
+                                                <span class="app-list-name">
+                                                    Home
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="page_inbox_general.html" class="app-list-item text-white border-0 m-0">
+                                                <div class="icon-stack">
+                                                    <i class="base base-7 icon-stack-3x opacity-100 color-success-500 "></i>
+                                                    <i class="base base-7 icon-stack-2x opacity-100 color-success-300 "></i>
+                                                    <i class="ni ni-envelope icon-stack-1x text-white"></i>
+                                                </div>
+                                                <span class="app-list-name">
+                                                    Inbox
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="intel_introduction.html" class="app-list-item text-white border-0 m-0">
+                                                <div class="icon-stack">
+                                                    <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
+                                                    <i class="fal fa-plus icon-stack-1x opacity-100 color-white"></i>
+                                                </div>
+                                                <span class="app-list-name">
+                                                    Add More
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END Shortcuts -->
+                    <!-- BEGIN Color profile -->
+                    <!-- this area is hidden and will not be seen on screens or screen readers -->
+                    <!-- we use this only for CSS color refernce for JS stuff -->
+                    <p id="js-color-profile" class="d-none">
+                        <span class="color-primary-50"></span>
+                        <span class="color-primary-100"></span>
+                        <span class="color-primary-200"></span>
+                        <span class="color-primary-300"></span>
+                        <span class="color-primary-400"></span>
+                        <span class="color-primary-500"></span>
+                        <span class="color-primary-600"></span>
+                        <span class="color-primary-700"></span>
+                        <span class="color-primary-800"></span>
+                        <span class="color-primary-900"></span>
+                        <span class="color-info-50"></span>
+                        <span class="color-info-100"></span>
+                        <span class="color-info-200"></span>
+                        <span class="color-info-300"></span>
+                        <span class="color-info-400"></span>
+                        <span class="color-info-500"></span>
+                        <span class="color-info-600"></span>
+                        <span class="color-info-700"></span>
+                        <span class="color-info-800"></span>
+                        <span class="color-info-900"></span>
+                        <span class="color-danger-50"></span>
+                        <span class="color-danger-100"></span>
+                        <span class="color-danger-200"></span>
+                        <span class="color-danger-300"></span>
+                        <span class="color-danger-400"></span>
+                        <span class="color-danger-500"></span>
+                        <span class="color-danger-600"></span>
+                        <span class="color-danger-700"></span>
+                        <span class="color-danger-800"></span>
+                        <span class="color-danger-900"></span>
+                        <span class="color-warning-50"></span>
+                        <span class="color-warning-100"></span>
+                        <span class="color-warning-200"></span>
+                        <span class="color-warning-300"></span>
+                        <span class="color-warning-400"></span>
+                        <span class="color-warning-500"></span>
+                        <span class="color-warning-600"></span>
+                        <span class="color-warning-700"></span>
+                        <span class="color-warning-800"></span>
+                        <span class="color-warning-900"></span>
+                        <span class="color-success-50"></span>
+                        <span class="color-success-100"></span>
+                        <span class="color-success-200"></span>
+                        <span class="color-success-300"></span>
+                        <span class="color-success-400"></span>
+                        <span class="color-success-500"></span>
+                        <span class="color-success-600"></span>
+                        <span class="color-success-700"></span>
+                        <span class="color-success-800"></span>
+                        <span class="color-success-900"></span>
+                        <span class="color-fusion-50"></span>
+                        <span class="color-fusion-100"></span>
+                        <span class="color-fusion-200"></span>
+                        <span class="color-fusion-300"></span>
+                        <span class="color-fusion-400"></span>
+                        <span class="color-fusion-500"></span>
+                        <span class="color-fusion-600"></span>
+                        <span class="color-fusion-700"></span>
+                        <span class="color-fusion-800"></span>
+                        <span class="color-fusion-900"></span>
+                    </p>
+                    <!-- END Color profile -->
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="default-example-modal-lg-center" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Report Detail(CreditSafe)</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-container show">
+                            <div class="panel-content">
+                                <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                                    <thead class="bg-warning-200">
+                                        <tr>
+                                            <th>S.N</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>RegistrationNumber</th>
+                                            <th>VatNumber</th>
+                                            <th>Address</th>
+                                            <th>Financial Year</th>
+                                            <th>Id</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalCompaniesData1">
+                                                                                         
+                                    </tbody>                                    
+                                </table>
+                                <!-- datatable end -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Report Detail(UCS)</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-container show">
+                            <div class="panel-content">                                
+                                <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                                    <thead class="bg-warning-200">
+                                        <tr>
+                                            <th>S.N</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>RegistrationNumber</th>
+                                            <!-- <th>VatNumber</th> -->
+                                            <th>Address</th>
+                                            <th>ReportId</th>
+                                            <th>Financial Year</th>
+                                            <th>Last Purchased Date</th>
+                                            <th>Verified On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalCompaniesData2">
+                                                                                         
+                                    </tbody>                                    
+                                </table>
+                                <!-- datatable end -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect waves-themed" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary waves-effect waves-themed" id="saveorupdate" onclick="BuyReport(this)">Buy Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="default-example-modal-lg-right" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-right modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Order Investigation Table</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-container show">
+                            <div class="panel-content">
+                                <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                                    <thead class="bg-warning-200" style="position: sticky;top:0;">
+                                        <tr>
+                                            <th>OrderId</th>
+                                            <th>Name</th>
+                                            <th>OrderType</th>
+                                            <th>RegistrationNumber</th>
+                                            <th>Address</th>
+                                            <th>IsPdf</th>
+                                            <th>Del. Date</th>
+                                            <th>Country</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="orderCompaniesData1">
+                                                                                          -->
+                                    </tbody>                                    
+                                </table>
+                                <!-- datatable end -->
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect waves-themed" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src="{% static 'js/vendors.bundle.js' %}"></script>
+        <!-- <script src="{% static 'js/app.bundle.js' %}"></script> -->
+        <script type="{% static 'text/javascript' %}">
+            /* Activate smart panels */
+            $('#js-page-content').smartPanel();
+
+        </script>
+        <!-- The order of scripts is irrelevant. Please check out the plugin pages for more details about these plugins below: -->
+        <script src="{% static 'js/statistics/peity/peity.bundle.js' %}"></script>
+        <script src="{% static 'js/statistics/flot/flot.bundle.js' %}"></script>
+        <script src="{% static 'js/statistics/easypiechart/easypiechart.bundle.js' %}"></script>
+        <script src="{% static 'js/datagrid/datatables/datatables.bundle.js' %}"></script>
+        <script src="{% static 'js/custom.js' %}"></script>
+        
+    </body>
+    <!-- END Body -->
+</html>
+<!-- data-toggle='modal' data-target='#default-example-modal-lg-center' -->
