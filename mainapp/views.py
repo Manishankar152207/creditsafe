@@ -48,12 +48,12 @@ class QueryMatchType(Enum):
     ClosestKeywords = 7
 
 def db_connection():
-        conn = pyodbc.connect('DRIVER={SQL Server};SERVER=192.168.3.53;PORT=1433;DATABASE=MatrixAsiagateDB;UID=sa;PWD=admin@123456')
+        conn = pyodbc.connect('DRIVER={SQL Server};SERVER=IP;PORT=PORT;DATABASE=DATABASE;UID=UID;PWD=PWD')
         cursor = conn.cursor()
         return cursor
 
 def db_connection_ucs():
-        conn = pyodbc.connect('DRIVER={SQL Server};SERVER=192.168.3.53;PORT=1433;DATABASE=TCMNewDB;UID=sa;PWD=admin@123456')
+        conn = pyodbc.connect('DRIVER={SQL Server};SERVER=IP;PORT=PORT;DATABASE=DATABASE;UID=UID;PWD=PWD')
         cursor = conn.cursor()
         return cursor
 
@@ -103,7 +103,7 @@ def api_authenticate_and_fetch_company_list(request_data):
     # print(request_data)
     wsdl = "https://webservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl"
     session = Session()
-    session.auth = HTTPBasicAuth("Ucs!nd1A", "Cr3d!t753")
+    session.auth = HTTPBasicAuth("xxxxxxx", "xxxxxxxxx")
     client = Client(wsdl,transport=Transport(session=session))
     companies = client.service.FindCompanies(**request_data).Companies
     return companies
